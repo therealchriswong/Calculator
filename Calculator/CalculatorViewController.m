@@ -17,6 +17,7 @@
 @implementation CalculatorViewController
 
 @synthesize display;
+@synthesize displayHistory;
 @synthesize userIsInTheMiddleOfEnteringANumber;
 @synthesize brain = _brain;
 
@@ -44,6 +45,14 @@
 {
     [self.brain pushOperand:[self.display.text doubleValue]];
     self.userIsInTheMiddleOfEnteringANumber = NO;
+    
+    if( [self.displayHistory.text isEqualToString:@""]){
+        self.displayHistory.text = self.display.text;        
+    }
+    else {
+        self.displayHistory.text = [[self.displayHistory.text stringByAppendingString:@"_"] stringByAppendingString:self.display.text];
+    }
+
 }
 
 - (IBAction)operationPressed:(id)sender 
@@ -54,6 +63,28 @@
     NSString *operation = [sender currentTitle];
     double result = [self.brain performOperation:operation];
     self.display.text = [NSString stringWithFormat:@"%g", result];
+    
+    self.displayHistory.text = [[self.displayHistory.text stringByAppendingString:@" "] stringByAppendingFormat:operation];
+}
+
+- (IBAction)decimalPressed:(id)sender {
+    NSString *decimal = [sender currentTitle];
+    NSRange range = [self.display.text rangeOfString:@"."];
+    if( range.location == NSNotFound ){
+        self.display.text = [self.display.text stringByAppendingFormat:decimal];
+    }
+    if( !self.userIsInTheMiddleOfEnteringANumber ){
+        self.display.text = decimal;
+        self.userIsInTheMiddleOfEnteringANumber = YES;
+    }
+}
+
+- (IBAction)clearPressed 
+{
+    [self.brain clearCalculator];
+    self.display.text = @"0";
+    self.displayHistory.text = @"";
+    self.userIsInTheMiddleOfEnteringANumber = NO;
 }
 
 @end
