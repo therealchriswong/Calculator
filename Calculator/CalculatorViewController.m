@@ -50,7 +50,7 @@
         self.displayHistory.text = self.display.text;        
     }
     else {
-        self.displayHistory.text = [[self.displayHistory.text stringByAppendingString:@"_"] stringByAppendingString:self.display.text];
+        self.displayHistory.text = [[self.displayHistory.text stringByAppendingString:@" "] stringByAppendingString:self.display.text];
     }
 
 }
@@ -64,7 +64,8 @@
     double result = [self.brain performOperation:operation];
     self.display.text = [NSString stringWithFormat:@"%g", result];
     
-    self.displayHistory.text = [[self.displayHistory.text stringByAppendingString:@" "] stringByAppendingFormat:operation];
+    self.displayHistory.text = [self.displayHistory.text stringByAppendingFormat:@" %@", operation];
+
 }
 
 - (IBAction)decimalPressed:(id)sender {
@@ -87,4 +88,32 @@
     self.userIsInTheMiddleOfEnteringANumber = NO;
 }
 
+- (IBAction)backspacePressed {
+    if( self.userIsInTheMiddleOfEnteringANumber && self.display.text.length > 1){
+        self.display.text = [self.display.text substringToIndex:self.display.text.length-1];
+    }
+    else {
+        self.display.text=@"0";
+        self.userIsInTheMiddleOfEnteringANumber = NO;
+    }
+}
+
+- (IBAction)plusminusPressed:(id)sender {
+    NSString *minus = @"-";
+    if (self.userIsInTheMiddleOfEnteringANumber) {
+        if ( [self.display.text hasPrefix: minus]){
+            self.display.text = [self.display.text substringFromIndex:1]; 
+        }
+        
+        else {
+            self.display.text = [minus stringByAppendingString:self.display.text];
+        }
+    }
+    else {
+        double result = [self.brain performOperation:@"+-"];
+        self.display.text = [NSString stringWithFormat:@"%g", result];
+        self.displayHistory.text = [[self.displayHistory.text stringByAppendingString:@" "] stringByAppendingString:self.display.text] ;
+    }
+
+}
 @end
